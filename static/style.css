@@ -1,5 +1,7 @@
 :root {
     --input-padding: 0.5ch 2ch;
+    --button-x-margin: 2ch;
+    --form-bottom-padding: 1ch;
 }
 
 * {
@@ -21,6 +23,7 @@ body {
     margin: auto;
 }
 button {
+    margin-left: var(--button-x-margin);
     padding: var(--input-padding);
 }
 
@@ -29,6 +32,7 @@ input {
 }
 label {
     display: block;
+    margin-bottom: var(--form-bottom-padding);
 }
 
 .container {

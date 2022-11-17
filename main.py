@@ -2,6 +2,9 @@ from fastapi import FastAPI, Request, WebSocket
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
+from typing import List
+from vectorizer import build_model
+from models import ResponseBody
 # from analyzer import analyze_text
 
 app = FastAPI()
@@ -12,8 +15,17 @@ templates = Jinja2Templates(directory='templates')
 @app.get('/', response_class=HTMLResponse)
 def read_root(request: Request):
     return templates.TemplateResponse('index.html', { "request": request })
-    
-@app.websocket("/rank")
+
+
+@app.post('/model/')
+async def model_builder(results: List[str]):
+    try:
+        build_model(results)
+        return ResponseBody(True, "Models successfully built.").jsonify()
+    except BaseException as e:
+        return ResponseBody(True, e).jsonify()
+
+@app.websocket("/rank/")
 async def test(websocket: WebSocket):
     await websocket.accept()
     while True:

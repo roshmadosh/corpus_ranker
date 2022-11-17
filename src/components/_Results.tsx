@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 
+
 export const Results = () => {
     const [results, setResults] = useState<string[]>([]);
     const [result, setResult] = useState<string>('');
@@ -9,6 +10,21 @@ export const Results = () => {
         e.preventDefault();
         const updatedResults = [...results, result];
         setResults(updatedResults);
+    }
+
+    const buildModel = async () => {
+        const response_obj = await fetch('http://localhost:8000/model', {
+                method: "POST",
+                mode: "cors",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(results)
+            })
+        const  response = await response_obj.json();
+ 
+        console.log(response.message)
+        
     }
 
     return (
@@ -23,6 +39,7 @@ export const Results = () => {
                     <p>{result}</p>
                 ))}
             </div>
+            <button onClick={buildModel}>Build Model</button>
         </>
 
     )

@@ -16,22 +16,22 @@ def build_model(results: List[str]):
     nn_model = NearestNeighbors(n_neighbors=len(results), metric='cosine')
     nn_model.fit(results_transformed)
 
-    with open('nn_model.pickle', 'wb') as output_file:
+    with open('pickle_jar/nn_model.pickle', 'wb') as output_file:
         pickle.dump(nn_model, output_file)
 
-    with open('tfidf_model.pickle', 'wb') as output_file:
+    with open('pickle_jar/tfidf_model.pickle', 'wb') as output_file:
         pickle.dump(tfidf, output_file)
 
-    test = np.array(['I like cats'])
-    test_transformed = tfidf.transform(test)
+    # test = np.array(['I like cats'])
+    # test_transformed = tfidf.transform(test)
 
-    _, neighbor_ind = nn_model.kneighbors(test_transformed)
+    # _, neighbor_ind = nn_model.kneighbors(test_transformed)
 
-    neighbor_ind = neighbor_ind[0]
+    # neighbor_ind = neighbor_ind[0]
 
-    nearest_trained = [results[ind] for ind in neighbor_ind]
+    # nearest_trained = [results[ind] for ind in neighbor_ind]
 
-    print(nearest_trained)
+    # print(nearest_trained)
 
 
 def tokenizer(sentence: str):

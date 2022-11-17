@@ -26,11 +26,12 @@ async def model_builder(results: List[str]):
         return ResponseBody(True, e).jsonify()
 
 @app.websocket("/rank/")
-async def test(websocket: WebSocket):
+async def rank(websocket: WebSocket):
     await websocket.accept()
     while True:
         request = await websocket.receive_text()
         print(request)
+        await websocket.send_text(request)
         # result = analyze_text(request)
         # serialized = [str(val) for val in result['scores']]
         # await websocket.send_json({

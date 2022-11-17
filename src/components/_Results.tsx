@@ -7,7 +7,7 @@ export const Results = () => {
 
 
     const addResult = (e: any): void => {
-        e.preventDefault();
+        e.preventDefault()
         const updatedResults = [...results, result];
         setResults(updatedResults);
     }

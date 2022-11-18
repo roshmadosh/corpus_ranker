@@ -3,11 +3,11 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from typing import List
-from vectorizer import build_models, rank_results
+from vectorizer import build_models, rank_results, import_models
 from models import ResponseBody
 
-# from analyzer import analyze_text
 
+tfidf, nn = import_models()
 app = FastAPI()
 
 app.mount('/static', StaticFiles(directory='static'), name='static')
@@ -31,7 +31,6 @@ async def rank(websocket: WebSocket):
     await websocket.accept()
     while True:
         results_obj = await websocket.receive_json()
-        
         user_input = results_obj.get('userInput', '')
         corpus = results_obj.get('corpus', [])
 
@@ -39,7 +38,8 @@ async def rank(websocket: WebSocket):
             continue
 
         try:
-            ranks = rank_results(user_input, corpus)
+            ranks = rank_results(user_input, corpus, tfidf=tfidf, nn=nn)
+            print(user_input, ranks)
             await websocket.send_json(ResponseBody(True, "Results successfully ranked!", ranks=ranks).jsonify())
         except BaseException as e:
             await websocket.send_json(ResponseBody(False, e))

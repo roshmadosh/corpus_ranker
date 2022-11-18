@@ -2,7 +2,7 @@ import React from 'react';
 import { AppChildrenPropTypes } from '../App';
 
 
-export const Predict = ({ corpus, websocket, setToast }: AppChildrenPropTypes['predict']) => {
+export const Predict = ({ corpus, websocket, setToast, setCorpus }: AppChildrenPropTypes['predict']) => {
 
     websocket.onmessage = event => {
         const { data } = event;
@@ -10,10 +10,9 @@ export const Predict = ({ corpus, websocket, setToast }: AppChildrenPropTypes['p
         const { success, message, ranks } = response_obj
         
         if (success) {
-            console.log(ranks)
-            console.log(typeof ranks)
+            setCorpus(ranks);
         } else {
-            setToast({ success, message })
+            setToast({ success, message });
         }
     }
 

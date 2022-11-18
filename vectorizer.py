@@ -26,25 +26,27 @@ def build_models(results: List[str]):
         output_file.write(json.dumps(results))
 
 
-def rank_results(user_input: str, corpus: List[str]) -> List[str]:
-    tfidf_model, nn_model = _import_models()
+def rank_results(user_input: str, corpus: List[str], tfidf, nn) -> List[str]:
         
     # vectorize user input
-    user_input_vectorized = tfidf_model.transform(np.array([user_input]))
+    user_input_vectorized = tfidf.transform(np.array([user_input]))
 
     # run nearest neighbors model   
-    _, neighbor_ind = nn_model.kneighbors(user_input_vectorized)
+    _, neighbor_ind = nn.kneighbors(user_input_vectorized)
 
     # above index is given as an array
     neighbor_indices = neighbor_ind[0]
+    print(user_input, neighbor_indices)
+    # get feature names in the order presented to the model during fitting
+    features = tfidf.get_feature_names()
 
     # rank corpus
-    rankings = [corpus[ind] for ind in neighbor_indices]
+    rankings = [features[ind] for ind in neighbor_indices]
 
     return rankings
 
 
-def _import_models() -> List:
+def import_models() -> List:
     # import models from pickle files
     with open('pickle_jar/tfidf_model.pickle', 'rb') as tfidf_file:
         tfidf_model = pickle.load(tfidf_file)

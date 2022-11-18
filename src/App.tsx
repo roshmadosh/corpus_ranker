@@ -12,6 +12,7 @@ export type AppChildrenPropTypes = {
     },
     predict: {
         corpus: AppState['corpus'],
+        setCorpus: StateSetter<AppState['corpus']>,
         setToast: StateSetter<AppState['toast']>,
         websocket: WebSocket
     }
@@ -36,7 +37,7 @@ export const App = () => {
     return (
         <main>
             <CorpusForm corpus={corpus} setCorpus={setCorpus} setToast={setToast}/>
-            <Predict corpus={corpus} websocket={ws} setToast={setToast}/>
+            <Predict corpus={corpus} websocket={ws} setToast={setToast} setCorpus={setCorpus}/>
             {toast && <Toast success={toast.success} message={toast.message}/>}
         </main>
     )

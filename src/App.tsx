@@ -34,11 +34,11 @@ export const App = () => {
     }, [toast])
 
     return (
-        <>
+        <main>
             <CorpusForm corpus={corpus} setCorpus={setCorpus} setToast={setToast}/>
             <Predict corpus={corpus} websocket={ws} setToast={setToast}/>
             {toast && <Toast success={toast.success} message={toast.message}/>}
-        </>
+        </main>
     )
 
 };

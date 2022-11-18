@@ -1,10 +1,10 @@
 import React, {useState} from 'react';
 import { AppChildrenPropTypes } from '../App';
 
+
 export const CorpusForm = ({ corpus , setCorpus, setToast }: AppChildrenPropTypes['corpusForm']) => {
 
     const [corpusElement, setCorpusElement] = useState<string>('');
-
 
     const addResult = (e: any): void => {
         e.preventDefault()
@@ -28,23 +28,31 @@ export const CorpusForm = ({ corpus , setCorpus, setToast }: AppChildrenPropType
     }
 
     return (
-        <>
-            <form className="add_result-container container" onSubmit={e => addResult(e)}>
-                <label htmlFor="add_result-input">Add to corpus:</label>
+        <section className="corpus-section mt-5">
+            <form className="corpus-form" onSubmit={e => addResult(e)}>
+                <label htmlFor="corpus-input" className="corpus-label full-width">Add to corpus:</label>
                 <input 
-                id="add_result-input" 
-                type="text" 
-                autoComplete='off'
-                onBlur={e => setCorpusElement(e.target.value)} />
+                    id="corpus-input" 
+                    className='full-width'
+                    type="text" 
+                    autoComplete='off'
+                    onBlur={e => setCorpusElement(e.target.value)} />
                 <button type='submit'>Add</button>
+                <button onClick={buildModel}>Build Model</button>
             </form>
-            <div className="corpus-container container">
-                {corpus.map(result => (
-                    <p>{result}</p>
+            <div className="corpus-container">
+                {corpus.map((content, idx) => (
+                    <CorpusElement content={content} idx={idx} />
                 ))}
             </div>
-            <button onClick={buildModel}>Build Model</button>
-        </>
 
+        </section>
+
+    )
+}
+
+const CorpusElement = ({ content, idx }: { content: string, idx: number }) => {
+    return (
+        <div className={`corpus-element full-width ce-${idx}`}>{content}</div>
     )
 }

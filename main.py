@@ -3,8 +3,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from typing import List
-from vectorizer import build_model
+from vectorizer import build_models, rank_results
 from models import ResponseBody
+
 # from analyzer import analyze_text
 
 app = FastAPI()
@@ -20,24 +21,27 @@ def read_root(request: Request):
 @app.post('/model/')
 async def model_builder(results: List[str]):
     try:
-        build_model(results)
+        build_models(results)
         return ResponseBody(True, "Models successfully built.").jsonify()
     except BaseException as e:
-        return ResponseBody(True, e).jsonify()
+        return ResponseBody(False, e).jsonify()
 
 @app.websocket("/rank/")
 async def rank(websocket: WebSocket):
     await websocket.accept()
     while True:
-        request = await websocket.receive_text()
-        print(request)
-        await websocket.send_text(request)
-        # result = analyze_text(request)
-        # serialized = [str(val) for val in result['scores']]
-        # await websocket.send_json({
-        #     "text": result['text'],
-        #     "NEGATIVE": serialized[0],
-        #     "NEUTRAL": serialized[1],
-        #     "POSITIVE": serialized[2]
-        # })
+        results_obj = await websocket.receive_json()
+        
+        user_input = results_obj.get('userInput', '')
+        corpus = results_obj.get('corpus', [])
+
+        if not user_input: 
+            continue
+
+        try:
+            ranks = rank_results(user_input, corpus)
+            await websocket.send_json(ResponseBody(True, "Results successfully ranked!", ranks=ranks).jsonify())
+        except BaseException as e:
+            await websocket.send_json(ResponseBody(False, e))
+
 

@@ -5,13 +5,13 @@ import numpy as np
 from typing import List
 import string
 import pickle
+import json
 
 stemmer = nltk.stem.PorterStemmer()
 
-X_train = ['This is a sentence', 'A dog walks', 'Walking cat.', "talk'ing cat"]
 
-def build_model(results: List[str]):
-    tfidf = TfidfVectorizer(tokenizer=tokenizer, stop_words='english')
+def build_models(results: List[str]):
+    tfidf = TfidfVectorizer(tokenizer=_tokenizer, stop_words='english')
     results_transformed = tfidf.fit_transform(results)
     nn_model = NearestNeighbors(n_neighbors=len(results), metric='cosine')
     nn_model.fit(results_transformed)
@@ -21,20 +21,42 @@ def build_model(results: List[str]):
 
     with open('pickle_jar/tfidf_model.pickle', 'wb') as output_file:
         pickle.dump(tfidf, output_file)
-
-    # test = np.array(['I like cats'])
-    # test_transformed = tfidf.transform(test)
-
-    # _, neighbor_ind = nn_model.kneighbors(test_transformed)
-
-    # neighbor_ind = neighbor_ind[0]
-
-    # nearest_trained = [results[ind] for ind in neighbor_ind]
-
-    # print(nearest_trained)
+    
+    with open('pickle_jar/corpus.txt', 'w') as output_file:
+        output_file.write(json.dumps(results))
 
 
-def tokenizer(sentence: str):
+def rank_results(user_input: str, corpus: List[str]) -> List[str]:
+    tfidf_model, nn_model = _import_models()
+        
+    # vectorize user input
+    user_input_vectorized = tfidf_model.transform(np.array([user_input]))
+
+    # run nearest neighbors model   
+    _, neighbor_ind = nn_model.kneighbors(user_input_vectorized)
+
+    # above index is given as an array
+    neighbor_indices = neighbor_ind[0]
+
+    # rank corpus
+    rankings = [corpus[ind] for ind in neighbor_indices]
+
+    return rankings
+
+
+def _import_models() -> List:
+    # import models from pickle files
+    with open('pickle_jar/tfidf_model.pickle', 'rb') as tfidf_file:
+        tfidf_model = pickle.load(tfidf_file)
+
+    
+    with open('pickle_jar/nn_model.pickle', 'rb') as nn_file:
+        nn_model = pickle.load(nn_file)
+    
+    return [tfidf_model, nn_model]
+
+
+def _tokenizer(sentence: str):
     punc_removed = list()
     for word in sentence.split():
         for punc in string.punctuation:

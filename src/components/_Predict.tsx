@@ -1,12 +1,28 @@
-import React, {useState} from 'react';
+import React from 'react';
+import { AppChildrenPropTypes } from '../App';
 
 
-export const Predict = () => {
-    const ws = new WebSocket("ws://localhost:8000/rank/")
-    const [search, setSearch] = useState<string>('');
+export const Predict = ({ results, websocket, setToast }: AppChildrenPropTypes['predict']) => {
 
-    ws.onmessage = event => {
-        console.log(event)
+    websocket.onmessage = event => {
+        const { data } = event;
+        const response_obj = JSON.parse(data);
+        const { success, message, ranks } = response_obj
+        
+        if (success) {
+            console.log(ranks)
+            console.log(typeof ranks)
+        } else {
+            setToast({ success, message })
+        }
+    }
+
+    const rankResults = (e: any) => {
+        const results_obj = {
+            userInput: e.target.value, 
+            corpus: results
+        }
+        websocket.send(JSON.stringify(results_obj))
     }
 
     return (
@@ -15,7 +31,8 @@ export const Predict = () => {
             <input 
                 type="text" 
                 id="search-input"
-                onChange={e => ws.send(e.target.value)}
+                autoComplete="off"
+                onChange={e => rankResults(e)}
             />
         </div>
     )

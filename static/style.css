@@ -2,6 +2,7 @@
     --input-padding: 0.5ch 2ch;
     --button-x-margin: 2ch;
     --form-bottom-padding: 1ch;
+    --page-margin: 90%;
 }
 
 * {
@@ -17,18 +18,20 @@ html {
 
 body {
     font-size: 1.6rem;
-    width: 90%;
+    width: var(--page-margin);
     height: 100vh;
     max-width: 1460px;
     margin: auto;
 }
 button {
-    margin-left: var(--button-x-margin);
     padding: var(--input-padding);
 }
 
 input {
     padding: var(--input-padding);
+}
+button, input {
+    margin-right: var(--button-x-margin);
 }
 label {
     display: block;
@@ -39,3 +42,21 @@ label {
     margin-top: 5rem;
 }
 
+.toast {
+    padding: var(--input-padding);
+    width: 40%;
+    min-width: 30ch;
+    font-weight: 700;
+    color: ghostwhite;
+    position: absolute;
+    bottom: 5vh;
+    left: calc(100% - var(--page-margin));
+    border: 1px solid transparent;
+    border-radius: .75rem;
+}
+.success {
+    background-color: darkgreen;
+}
+.fail {
+    background-color: tomato;
+}

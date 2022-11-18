@@ -37,11 +37,9 @@ def rank_results(user_input: str, corpus: List[str], tfidf, nn) -> List[str]:
     # above index is given as an array
     neighbor_indices = neighbor_ind[0]
     print(user_input, neighbor_indices)
-    # get feature names in the order presented to the model during fitting
-    features = tfidf.get_feature_names()
 
     # rank corpus
-    rankings = [features[ind] for ind in neighbor_indices]
+    rankings = [corpus[ind] for ind in neighbor_indices]
 
     return rankings
 
@@ -54,8 +52,11 @@ def import_models() -> List:
     
     with open('pickle_jar/nn_model.pickle', 'rb') as nn_file:
         nn_model = pickle.load(nn_file)
+
+    with open('pickle_jar/corpus.txt', 'r') as corpus_file:
+        corpus = json.loads(corpus_file.read())
     
-    return [tfidf_model, nn_model]
+    return [tfidf_model, nn_model, corpus]
 
 
 def _tokenizer(sentence: str):

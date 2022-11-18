@@ -7,7 +7,7 @@ from vectorizer import build_models, rank_results, import_models
 from models import ResponseBody
 
 
-tfidf, nn = import_models()
+
 app = FastAPI()
 
 app.mount('/static', StaticFiles(directory='static'), name='static')
@@ -26,13 +26,14 @@ async def model_builder(results: List[str]):
     except BaseException as e:
         return ResponseBody(False, e).jsonify()
 
+
 @app.websocket("/rank/")
 async def rank(websocket: WebSocket):
+    tfidf, nn, corpus = import_models()
     await websocket.accept()
     while True:
         results_obj = await websocket.receive_json()
         user_input = results_obj.get('userInput', '')
-        corpus = results_obj.get('corpus', [])
 
         if not user_input: 
             continue

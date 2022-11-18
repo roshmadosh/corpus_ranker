@@ -18,6 +18,7 @@ def build_models(results: List[str]):
 
     with open('pickle_jar/nn_model.pickle', 'wb') as output_file:
         pickle.dump(nn_model, output_file)
+ 
 
     with open('pickle_jar/tfidf_model.pickle', 'wb') as output_file:
         pickle.dump(tfidf, output_file)
@@ -36,7 +37,6 @@ def rank_results(user_input: str, corpus: List[str], tfidf, nn) -> List[str]:
 
     # above index is given as an array
     neighbor_indices = neighbor_ind[0]
-    print(user_input, neighbor_indices)
 
     # rank corpus
     rankings = [corpus[ind] for ind in neighbor_indices]
@@ -48,7 +48,6 @@ def import_models() -> List:
     # import models from pickle files
     with open('pickle_jar/tfidf_model.pickle', 'rb') as tfidf_file:
         tfidf_model = pickle.load(tfidf_file)
-
     
     with open('pickle_jar/nn_model.pickle', 'rb') as nn_file:
         nn_model = pickle.load(nn_file)

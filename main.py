@@ -6,7 +6,7 @@ from typing import List
 from vectorizer import build_models, rank_results, import_models
 from models import ResponseBody
 
-
+models = list()
 
 app = FastAPI()
 
@@ -25,14 +25,17 @@ async def model_builder(results: List[str]):
         return ResponseBody(True, "Models successfully built.").jsonify()
     except BaseException as e:
         return ResponseBody(False, e).jsonify()
+    
 
 
 @app.websocket("/rank/")
 async def rank(websocket: WebSocket):
-    tfidf, nn, corpus = import_models()
     await websocket.accept()
     while True:
         results_obj = await websocket.receive_json()
+
+        # TODO store these statically
+        tfidf, nn, corpus = import_models()
         user_input = results_obj.get('userInput', '')
 
         if not user_input: 

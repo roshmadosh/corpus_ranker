@@ -18,5 +18,15 @@
   "bugs": {
     "url": "https://github.com/roshmadosh/text_search_poc/issues"
   },
-  "homepage": "https://github.com/roshmadosh/text_search_poc#readme"
+  "homepage": "https://github.com/roshmadosh/text_search_poc#readme",
+  "devDependencies": {
+    "@types/react": "^18.0.25",
+    "@types/react-dom": "^18.0.9",
+    "esbuild": "^0.15.14",
+    "typescript": "^4.9.3"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
 }

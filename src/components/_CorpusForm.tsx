@@ -6,8 +6,7 @@ export const CorpusForm = ({ corpus , setCorpus, setToast }: AppChildrenPropType
 
     const [corpusElement, setCorpusElement] = useState<string>('');
 
-    const addResult = (e: any): void => {
-        e.preventDefault()
+    const addResult = () => {
         const updatedCorpus = [...corpus, corpusElement];
         setCorpus(updatedCorpus);
     }
@@ -29,7 +28,7 @@ export const CorpusForm = ({ corpus , setCorpus, setToast }: AppChildrenPropType
 
     return (
         <section className="corpus-section mt-5">
-            <form className="corpus-form" onSubmit={e => addResult(e)}>
+            <form className="corpus-form">
                 <label htmlFor="corpus-input" className="corpus-label full-width">Add to corpus:</label>
                 <input 
                     id="corpus-input" 
@@ -37,8 +36,8 @@ export const CorpusForm = ({ corpus , setCorpus, setToast }: AppChildrenPropType
                     type="text" 
                     autoComplete='off'
                     onBlur={e => setCorpusElement(e.target.value)} />
-                <button type='submit'>Add</button>
-                <button onClick={buildModel}>Build Model</button>
+                <button type='button' onClick={addResult}>Add</button>
+                <button type='button' onClick={buildModel}>Build Model</button>
             </form>
             <div className="corpus-container">
                 {corpus.map((content, idx) => (

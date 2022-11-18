@@ -1,2 +1,2 @@
-export { ResultsForm } from "./_ResultsForm";
+export { CorpusForm } from "./_CorpusForm";
 export { Predict } from "./_Predict";

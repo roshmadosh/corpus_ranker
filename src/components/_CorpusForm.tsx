@@ -1,15 +1,15 @@
 import React, {useState} from 'react';
 import { AppChildrenPropTypes } from '../App';
 
-export const ResultsForm = ({ results , setResults, setToast }: AppChildrenPropTypes['resultsForm']) => {
+export const CorpusForm = ({ corpus , setCorpus, setToast }: AppChildrenPropTypes['corpusForm']) => {
 
-    const [result, setResult] = useState<string>('');
+    const [corpusElement, setCorpusElement] = useState<string>('');
 
 
     const addResult = (e: any): void => {
         e.preventDefault()
-        const updatedResults = [...results, result];
-        setResults(updatedResults);
+        const updatedCorpus = [...corpus, corpusElement];
+        setCorpus(updatedCorpus);
     }
 
     const buildModel = async () => {
@@ -19,7 +19,7 @@ export const ResultsForm = ({ results , setResults, setToast }: AppChildrenPropT
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(results)
+                body: JSON.stringify(corpus)
             })
         const response = await response_obj.json();
  
@@ -30,16 +30,16 @@ export const ResultsForm = ({ results , setResults, setToast }: AppChildrenPropT
     return (
         <>
             <form className="add_result-container container" onSubmit={e => addResult(e)}>
-                <label htmlFor="add_result-input">Add a result here:</label>
+                <label htmlFor="add_result-input">Add to corpus:</label>
                 <input 
                 id="add_result-input" 
                 type="text" 
                 autoComplete='off'
-                onBlur={e => setResult(e.target.value)} />
+                onBlur={e => setCorpusElement(e.target.value)} />
                 <button type='submit'>Add</button>
             </form>
-            <div className="results-container container">
-                {results.map(result => (
+            <div className="corpus-container container">
+                {corpus.map(result => (
                     <p>{result}</p>
                 ))}
             </div>

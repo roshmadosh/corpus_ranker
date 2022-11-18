@@ -50,7 +50,7 @@ label {
     color: ghostwhite;
     position: absolute;
     bottom: 5vh;
-    left: calc(100% - var(--page-margin));
+    left: 4rem;
     border: 1px solid transparent;
     border-radius: .75rem;
 }

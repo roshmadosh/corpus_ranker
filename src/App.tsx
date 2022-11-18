@@ -1,32 +1,31 @@
 import React, { useState, useEffect } from "react";
-import { ResultsForm, Predict } from "./components";
+import { CorpusForm, Predict } from "./components";
 import { ToastType, Toast } from "./components/_Toast";
 import { StateSetter } from "./utils"
 
 
-
 export type AppChildrenPropTypes = {
-    resultsForm: {
-        results: AppState['results'],
-        setResults: StateSetter<AppState['results']>,
+    corpusForm: {
+        corpus: AppState['corpus'],
+        setCorpus: StateSetter<AppState['corpus']>,
         setToast: StateSetter<AppState['toast']>
     },
     predict: {
-        results: AppState['results'],
+        corpus: AppState['corpus'],
         setToast: StateSetter<AppState['toast']>,
         websocket: WebSocket
     }
 }
 
 type AppState = {
-    results: string[],
+    corpus: string[],
     toast: ToastType | undefined
 }
 
 const ws = new WebSocket("ws://localhost:8000/rank/");
 
 export const App = () => {
-    const [results, setResults] = useState<AppState['results']>([]);
+    const [corpus, setCorpus] = useState<AppState['corpus']>([]);
     const [toast, setToast] = useState<AppState['toast']>()
     
     useEffect(() => {
@@ -36,8 +35,8 @@ export const App = () => {
 
     return (
         <>
-            <ResultsForm results={results} setResults={setResults} setToast={setToast}/>
-            <Predict results={results} websocket={ws} setToast={setToast}/>
+            <CorpusForm corpus={corpus} setCorpus={setCorpus} setToast={setToast}/>
+            <Predict corpus={corpus} websocket={ws} setToast={setToast}/>
             {toast && <Toast success={toast.success} message={toast.message}/>}
         </>
     )

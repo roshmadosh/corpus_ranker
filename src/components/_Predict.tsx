@@ -2,7 +2,7 @@ import React from 'react';
 import { AppChildrenPropTypes } from '../App';
 
 
-export const Predict = ({ results, websocket, setToast }: AppChildrenPropTypes['predict']) => {
+export const Predict = ({ corpus, websocket, setToast }: AppChildrenPropTypes['predict']) => {
 
     websocket.onmessage = event => {
         const { data } = event;
@@ -17,12 +17,12 @@ export const Predict = ({ results, websocket, setToast }: AppChildrenPropTypes['
         }
     }
 
-    const rankResults = (e: any) => {
-        const results_obj = {
+    const rankCorpus = (e: any) => {
+        const corpus_obj = {
             userInput: e.target.value, 
-            corpus: results
+            corpus: corpus
         }
-        websocket.send(JSON.stringify(results_obj))
+        websocket.send(JSON.stringify(corpus_obj))
     }
 
     return (
@@ -32,7 +32,7 @@ export const Predict = ({ results, websocket, setToast }: AppChildrenPropTypes['
                 type="text" 
                 id="search-input"
                 autoComplete="off"
-                onChange={e => rankResults(e)}
+                onChange={e => rankCorpus(e)}
             />
         </div>
     )

@@ -6,6 +6,7 @@ from typing import List
 import string
 import pickle
 import json
+from utils import create_dir_if_none
 
 stemmer = nltk.stem.PorterStemmer()
 
@@ -16,10 +17,11 @@ def build_models(results: List[str]):
     nn_model = NearestNeighbors(n_neighbors=len(results), metric='cosine')
     nn_model.fit(results_transformed)
 
+    create_dir_if_none(['pickle_jar'])
+
     with open('pickle_jar/nn_model.pickle', 'wb') as output_file:
         pickle.dump(nn_model, output_file)
  
-
     with open('pickle_jar/tfidf_model.pickle', 'wb') as output_file:
         pickle.dump(tfidf, output_file)
     

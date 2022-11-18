@@ -5,7 +5,8 @@ from fastapi.responses import HTMLResponse
 from typing import List
 from vectorizer import build_models, rank_results, import_models
 from models import ResponseBody
-
+import datetime
+from utils import create_dir_if_none
 models = list()
 
 app = FastAPI()
@@ -23,8 +24,12 @@ async def model_builder(results: List[str]):
     try:
         build_models(results)
         return ResponseBody(True, "Models successfully built.").jsonify()
-    except BaseException as e:
-        return ResponseBody(False, e).jsonify()
+    except Exception as e:
+        print('ERROR:', e)
+        create_dir_if_none(['logs'])
+        with open(f'logs/{datetime.date.today()}.txt', 'w+') as file:
+            file.write(f'{datetime.datetime.now()}: {e}')
+        return ResponseBody(False, 'Something went wrong. Please see server logs.').jsonify()
     
 
 
@@ -43,7 +48,6 @@ async def rank(websocket: WebSocket):
 
         try:
             ranks = rank_results(user_input, corpus, tfidf=tfidf, nn=nn)
-            print(user_input, ranks)
             await websocket.send_json(ResponseBody(True, "Results successfully ranked!", ranks=ranks).jsonify())
         except BaseException as e:
             await websocket.send_json(ResponseBody(False, e))

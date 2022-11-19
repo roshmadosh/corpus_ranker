@@ -13,9 +13,14 @@ export const CorpusForm = ({ corpus , setCorpus, setToast }: AppChildrenPropType
     }
 
     const buildModel = async () => {
+
+        // save corpus to local storage
+        localStorage.setItem('corpus-ranker_corpus', JSON.stringify(corpus));
+
         const request_body = {
             corpus
         }
+
         const response_obj = await fetch('http://localhost:8000/model', {
                 method: "POST",
                 mode: "cors",
@@ -24,6 +29,7 @@ export const CorpusForm = ({ corpus , setCorpus, setToast }: AppChildrenPropType
                 },
                 body: JSON.stringify(request_body)
             })
+
         const response = await response_obj.json();
  
         setToast({ success: response.success, message: response.message })

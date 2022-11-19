@@ -6,12 +6,12 @@ from typing import List
 import string
 import pickle
 import json
-from utils import create_dir_if_none
+from models import S3Accessor
 
 stemmer = nltk.stem.PorterStemmer()
 
 
-def build_models(corpus, tfidf_args, nn_args):
+def build_models(user_id, corpus, tfidf_args, nn_args):
     # get user-determined hyperparameters for tfidf
     stop_words = tfidf_args.get('stop_words', None)
     analyzer = tfidf_args.get('analyzer', 'word')
@@ -26,20 +26,11 @@ def build_models(corpus, tfidf_args, nn_args):
     nn_model = NearestNeighbors(n_neighbors=len(corpus), metric=metric)
     nn_model.fit(corpus_transformed)
 
-    create_dir_if_none(['pickle_jar'])
-
-    with open('pickle_jar/nn_model.pickle', 'wb') as output_file:
-        pickle.dump(nn_model, output_file)
- 
-    with open('pickle_jar/tfidf_model.pickle', 'wb') as output_file:
-        pickle.dump(tfidf, output_file)
-    
-    with open('pickle_jar/corpus.txt', 'w') as output_file:
-        output_file.write(json.dumps(corpus))
+    # persist to s3
+    _persist_models(user_id, tfidf, nn_model)
 
 
 def rank_corpus(user_input: str, corpus: List[str], tfidf, nn) -> List[str]:
-        
     # vectorize user input
     user_input_vectorized = tfidf.transform(np.array([user_input]))
 
@@ -55,18 +46,22 @@ def rank_corpus(user_input: str, corpus: List[str], tfidf, nn) -> List[str]:
     return rankings
 
 
-def import_models() -> List:
+def import_models(user_id) -> List:
+    s3_accessor = S3Accessor(user_id=user_id)
+    
     # import models from pickle files
-    with open('pickle_jar/tfidf_model.pickle', 'rb') as tfidf_file:
-        tfidf_model = pickle.load(tfidf_file)
-    
-    with open('pickle_jar/nn_model.pickle', 'rb') as nn_file:
-        nn_model = pickle.load(nn_file)
+    try:
+        tfidf_raw = s3_accessor.read_from_bucket('tfidf_model.pickle')
+        nn_raw = s3_accessor.read_from_bucket('nn_model.pickle')
 
-    with open('pickle_jar/corpus.txt', 'r') as corpus_file:
-        corpus = json.loads(corpus_file.read())
+        tfidf_model = pickle.loads(tfidf_raw.read())[0]
+        nn_model = pickle.loads(nn_raw.read())[0]
+        
+    except Exception as e:
+        print('ERROR in vectorizor.py, import_models(), see logs.')
+        raise e
     
-    return [tfidf_model, nn_model, corpus]
+    return [tfidf_model, nn_model]
 
 
 def _tokenizer(sentence: str):
@@ -78,3 +73,10 @@ def _tokenizer(sentence: str):
     
     stemmed = [stemmer.stem(word) for word in punc_removed]
     return stemmed
+
+def _persist_models(user_id: str, tfidf_model, nn_model):
+    s3_accessor = S3Accessor(user_id=user_id)
+
+    s3_accessor.write_to_bucket('tfidf_model.pickle', pickle.dumps([tfidf_model]))
+    s3_accessor.write_to_bucket('nn_model.pickle', pickle.dumps([nn_model]))
+

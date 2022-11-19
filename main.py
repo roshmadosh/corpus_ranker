@@ -6,7 +6,7 @@ from typing import List
 from vectorizer import build_models, rank_corpus, import_models
 from models import ResponseBody, ModelBuilderParams
 import datetime
-from utils import create_dir_if_none
+from utils import create_dir_if_none, write_log
 
 
 app = FastAPI()
@@ -26,30 +26,45 @@ async def model_builder(args: ModelBuilderParams):
         return ResponseBody(True, "Models successfully built.").jsonify()
     except Exception as e:
         print('ERROR:', e)
-        create_dir_if_none(['logs'])
-        with open(f'logs/{datetime.date.today()}.txt', 'a') as file:
-            file.write(f'{datetime.datetime.now()}: {e}')
-        return ResponseBody(False, 'Something went wrong. Please see server logs.\n').jsonify()
+        write_log(e)
+        return ResponseBody(False, 'Something went wrong. Please see server logs.').jsonify()
     
 
 
 @app.websocket("/rank/")
 async def rank(websocket: WebSocket):
     await websocket.accept()
+
+    # attempt to make models "static" after first fetch
+    tfidf = None
+    nn = None
+
     while True:
         results_obj = await websocket.receive_json()
 
-        # TODO store these statically
-        tfidf, nn, corpus = import_models()
+        # destructure results dict
+        user_id = results_obj.get('userId', 1)
+        corpus = results_obj.get('corpus', [])
         user_input = results_obj.get('userInput', '')
 
         if not user_input: 
             continue
 
+        # fetch models from S3, if needed
+        try:
+            if not tfidf or not nn:
+                tfidf, nn = import_models(user_id=user_id)
+
+        except Exception as e:
+            write_log(e)
+            print("ERROR in main.py, rank():", e)
+            return
+
+        # run models
         try:
             ranks = rank_corpus(user_input, corpus, tfidf=tfidf, nn=nn)
             await websocket.send_json(ResponseBody(True, "Results successfully ranked!", ranks=ranks).jsonify())
         except BaseException as e:
-            await websocket.send_json(ResponseBody(False, e))
-
+            await websocket.send_json(ResponseBody(False, "Something went wrong while ranking corpus. See logs.").jsonify())
+            write_log(e)
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { AppChildrenPropTypes } from '../App';
 
 
-export const Predict = ({ corpus, websocket, setToast, setCorpus }: AppChildrenPropTypes['predict']) => {
+export const Predict = ({ websocket, setToast, setCorpus }: AppChildrenPropTypes['predict']) => {
 
     websocket.onmessage = event => {
         const { data } = event;
@@ -17,9 +17,10 @@ export const Predict = ({ corpus, websocket, setToast, setCorpus }: AppChildrenP
     }
 
     const rankCorpus = (e: any) => {
+        const corpus = localStorage.getItem('corpus-ranker_corpus') ?? '[]'
         const corpus_obj = {
             userInput: e.target.value, 
-            corpus: corpus
+            corpus: JSON.parse(corpus)
         }
         websocket.send(JSON.stringify(corpus_obj))
     }

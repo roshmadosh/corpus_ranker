@@ -13,13 +13,16 @@ export const CorpusForm = ({ corpus , setCorpus, setToast }: AppChildrenPropType
     }
 
     const buildModel = async () => {
+        const request_body = {
+            corpus
+        }
         const response_obj = await fetch('http://localhost:8000/model', {
                 method: "POST",
                 mode: "cors",
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(corpus)
+                body: JSON.stringify(request_body)
             })
         const response = await response_obj.json();
  

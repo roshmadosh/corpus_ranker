@@ -11,22 +11,20 @@ from utils import create_dir_if_none
 stemmer = nltk.stem.PorterStemmer()
 
 
-def build_models(results: List[str], **kwargs):
+def build_models(corpus, tfidf_args, nn_args):
     # get user-determined hyperparameters for tfidf
-    tfidf_args = kwargs.get('tfidf_args', dict())
     stop_words = tfidf_args.get('stop_words', None)
     analyzer = tfidf_args.get('analyzer', 'word')
     tokenizer = _tokenizer if analyzer == 'word' else None
     ngram_range = tfidf_args.get('ngram_range', (1,1))
 
     # do the same for nearest neighbors
-    nn_args = kwargs.get('nn_args', dict())
     metric = nn_args.get('metric', 'cosine')
-    
+
     tfidf = TfidfVectorizer(stop_words=stop_words, analyzer=analyzer, tokenizer=tokenizer, ngram_range=ngram_range)
-    results_transformed = tfidf.fit_transform(results)
-    nn_model = NearestNeighbors(n_neighbors=len(results), metric=metric)
-    nn_model.fit(results_transformed)
+    corpus_transformed = tfidf.fit_transform(corpus)
+    nn_model = NearestNeighbors(n_neighbors=len(corpus), metric=metric)
+    nn_model.fit(corpus_transformed)
 
     create_dir_if_none(['pickle_jar'])
 
@@ -37,10 +35,10 @@ def build_models(results: List[str], **kwargs):
         pickle.dump(tfidf, output_file)
     
     with open('pickle_jar/corpus.txt', 'w') as output_file:
-        output_file.write(json.dumps(results))
+        output_file.write(json.dumps(corpus))
 
 
-def rank_results(user_input: str, corpus: List[str], tfidf, nn) -> List[str]:
+def rank_corpus(user_input: str, corpus: List[str], tfidf, nn) -> List[str]:
         
     # vectorize user input
     user_input_vectorized = tfidf.transform(np.array([user_input]))

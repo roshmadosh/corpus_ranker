@@ -3,11 +3,11 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from typing import List
-from vectorizer import build_models, rank_results, import_models
-from models import ResponseBody
+from vectorizer import build_models, rank_corpus, import_models
+from models import ResponseBody, ModelBuilderParams
 import datetime
 from utils import create_dir_if_none
-models = list()
+
 
 app = FastAPI()
 
@@ -20,16 +20,16 @@ def read_root(request: Request):
 
 
 @app.post('/model/')
-async def model_builder(results: List[str]):
+async def model_builder(args: ModelBuilderParams):
     try:
-        build_models(results)
+        build_models(**args.dict())
         return ResponseBody(True, "Models successfully built.").jsonify()
     except Exception as e:
         print('ERROR:', e)
         create_dir_if_none(['logs'])
-        with open(f'logs/{datetime.date.today()}.txt', 'w+') as file:
+        with open(f'logs/{datetime.date.today()}.txt', 'a') as file:
             file.write(f'{datetime.datetime.now()}: {e}')
-        return ResponseBody(False, 'Something went wrong. Please see server logs.').jsonify()
+        return ResponseBody(False, 'Something went wrong. Please see server logs.\n').jsonify()
     
 
 
@@ -47,7 +47,7 @@ async def rank(websocket: WebSocket):
             continue
 
         try:
-            ranks = rank_results(user_input, corpus, tfidf=tfidf, nn=nn)
+            ranks = rank_corpus(user_input, corpus, tfidf=tfidf, nn=nn)
             await websocket.send_json(ResponseBody(True, "Results successfully ranked!", ranks=ranks).jsonify())
         except BaseException as e:
             await websocket.send_json(ResponseBody(False, e))

@@ -9,5 +9,3 @@ def create_dir_if_none(dirnames: List[str]):
         if not exists:
             os.makedirs(path)
             print(f'Created directory {dir}.')
-        else:
-            print(f'{dir} already exists.')

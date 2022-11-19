@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import { AppChildrenPropTypes } from '../App';
+import { motion, AnimatePresence } from "framer-motion"
 
 
 export const CorpusForm = ({ corpus , setCorpus, setToast }: AppChildrenPropTypes['corpusForm']) => {
@@ -39,19 +40,41 @@ export const CorpusForm = ({ corpus , setCorpus, setToast }: AppChildrenPropType
                 <button type='button' onClick={addResult}>Add</button>
                 <button type='button' onClick={buildModel}>Build Model</button>
             </form>
-            <div className="corpus-container">
-                {corpus.map((content, idx) => (
-                    <CorpusElement content={content} idx={idx} />
-                ))}
-            </div>
+            <CorpusContainer corpus={corpus} />
 
         </section>
 
     )
 }
 
+const CorpusContainer = ({ corpus }: { corpus: AppChildrenPropTypes['corpusForm']['corpus']}) => {
+    return (
+        <AnimatePresence>
+            <motion.div
+                className='corpus-container'
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+            >
+                {corpus.map((content, idx) => (
+                    <CorpusElement content={content} idx={idx} />
+                ))}
+            </motion.div>
+        </AnimatePresence>
+    )
+}
+
 const CorpusElement = ({ content, idx }: { content: string, idx: number }) => {
     return (
-        <div className={`corpus-element full-width ce-${idx}`}>{content}</div>
+        <AnimatePresence>
+            <motion.div
+                key={`ce-${idx}`}
+                className={`corpus-element full-width ce-${idx}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+            >{content}</motion.div>
+        </AnimatePresence>
+
     )
 }

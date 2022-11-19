@@ -11,10 +11,21 @@ from utils import create_dir_if_none
 stemmer = nltk.stem.PorterStemmer()
 
 
-def build_models(results: List[str]):
-    tfidf = TfidfVectorizer(tokenizer=_tokenizer, stop_words='english')
+def build_models(results: List[str], **kwargs):
+    # get user-determined hyperparameters for tfidf
+    tfidf_args = kwargs.get('tfidf_args', dict())
+    stop_words = tfidf_args.get('stop_words', None)
+    analyzer = tfidf_args.get('analyzer', 'word')
+    tokenizer = _tokenizer if analyzer == 'word' else None
+    ngram_range = tfidf_args.get('ngram_range', (1,1))
+
+    # do the same for nearest neighbors
+    nn_args = kwargs.get('nn_args', dict())
+    metric = nn_args.get('metric', 'cosine')
+    
+    tfidf = TfidfVectorizer(stop_words=stop_words, analyzer=analyzer, tokenizer=tokenizer, ngram_range=ngram_range)
     results_transformed = tfidf.fit_transform(results)
-    nn_model = NearestNeighbors(n_neighbors=len(results), metric='cosine')
+    nn_model = NearestNeighbors(n_neighbors=len(results), metric=metric)
     nn_model.fit(results_transformed)
 
     create_dir_if_none(['pickle_jar'])

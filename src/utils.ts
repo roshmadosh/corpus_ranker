@@ -1,3 +1,1 @@
-import { Dispatch, SetStateAction } from 'react';
-
-export type StateSetter<A> = Dispatch<SetStateAction<A>>
+type StateSetter<A> = (state: A) => void

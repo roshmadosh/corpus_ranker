@@ -2,29 +2,8 @@ import React from 'react';
 import { AppChildrenPropTypes } from '../App';
 
 
-export const Predict = ({ websocket, setToast, setCorpus }: AppChildrenPropTypes['predict']) => {
 
-    websocket.onmessage = event => {
-        const { data } = event;
-        const response_obj = JSON.parse(data);
-        const { success, message, ranks } = response_obj
-        
-        if (success) {
-            setCorpus(ranks);
-        } else {
-            setToast({ success, message });
-        }
-    }
-
-    const rankCorpus = (e: any) => {
-        const corpus = localStorage.getItem('corpus-ranker_corpus') ?? '[]'
-        const corpus_obj = {
-            userInput: e.target.value, 
-            corpus: JSON.parse(corpus)
-        }
-        websocket.send(JSON.stringify(corpus_obj))
-    }
-
+export const Predict = ({ rankCorpus }: PredictPropTypes) => {
     return (
         <div className="search-container container">
             <label htmlFor="search-input">Search:</label>
@@ -32,8 +11,12 @@ export const Predict = ({ websocket, setToast, setCorpus }: AppChildrenPropTypes
                 type="text" 
                 id="search-input"
                 autoComplete="off"
-                onChange={e => rankCorpus(e)}
+                onChange={e => rankCorpus(e.target.value)}
             />
         </div>
     )
+}
+
+type PredictPropTypes = {
+    rankCorpus: AppChildrenPropTypes['rankCorpus']
 }

@@ -1,10 +1,7 @@
 import React from 'react'
+import { FlagType } from '../utils'
 
-export type ToastType = {
-    success: boolean,
-    message: string
-}
-export const Toast = ({ success, message }: ToastType) => {
+export const Toast = ({ success, message }: FlagType) => {
 
     const className = `toast ${success ? 'success' : 'fail'}`
     return (

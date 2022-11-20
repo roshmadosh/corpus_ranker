@@ -1,19 +1,19 @@
 import React, {useState} from 'react';
-import { AppChildrenPropTypes, CorpusElementType } from '../App';
+import { useCorpusType, CorpusElementType } from '../hooks/useCorpus';
 import { motion, AnimatePresence } from "framer-motion"
 
 
 
-export const CorpusSection = ({ corpus , addResult, buildModel }: CorpusSectionPropTypes) => {
+export const CorpusSection = ({ corpus , addCorpusElement , buildModel }: CorpusSectionPropTypes) => {
     return (
         <section className="corpus-section mt-5">
-            <CorpusForm addResult={addResult} buildModel={buildModel} />
+            <CorpusForm addCorpusElement={addCorpusElement} buildModel={buildModel} />
             <CorpusContainer corpus={corpus} />
         </section>
     )
 }
 
-const CorpusForm = ({ addResult, buildModel }: CorpusFormPropTypes) => {
+const CorpusForm = ({ addCorpusElement, buildModel }: CorpusFormPropTypes) => {
     const [corpusElement, setCorpusElement] = useState<CorpusElementType>('');
     return (
         <form className="corpus-form mt-5">
@@ -24,7 +24,7 @@ const CorpusForm = ({ addResult, buildModel }: CorpusFormPropTypes) => {
             type="text" 
             autoComplete='off'
             onBlur={e => setCorpusElement(e.target.value)} />
-        <button type='button' onClick={() => addResult(corpusElement)}>Add</button>
+        <button type='button' onClick={() => addCorpusElement(corpusElement)}>Add</button>
         <button type='button' onClick={buildModel}>Build Model</button>
     </form>
     )
@@ -62,12 +62,12 @@ const CorpusElement = ({ content, idx }: { content: string, idx: number }) => {
 }
 
 type CorpusSectionPropTypes = {
-    corpus: AppChildrenPropTypes['corpus'],
-    addResult: AppChildrenPropTypes['addResult'],
-    buildModel: AppChildrenPropTypes['buildModel']
+    corpus: useCorpusType['corpus'],
+    addCorpusElement: useCorpusType['addCorpusElement'],
+    buildModel: useCorpusType['buildModel']
 }
 type CorpusFormPropTypes = {
-    addResult: AppChildrenPropTypes['addResult'], 
-    buildModel: AppChildrenPropTypes['buildModel']
+    addCorpusElement: useCorpusType['addCorpusElement'], 
+    buildModel: useCorpusType['buildModel']
 }
-type CorpusContainerPropTypes = { corpus: AppChildrenPropTypes['corpus'] }
+type CorpusContainerPropTypes = { corpus: useCorpusType['corpus'] }

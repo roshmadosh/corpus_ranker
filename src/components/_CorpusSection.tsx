@@ -4,21 +4,33 @@ import { motion, AnimatePresence } from "framer-motion"
 
 
 
-export const CorpusSection = ({ corpus , addCorpusElement, updateTfidfParams, removeCorpusElement, buildModel }: CorpusSectionPropTypes) => {
+export const CorpusSection = ({ corpus , addCorpusElement, updateTfidfParams, updateNnParams, removeCorpusElement, buildModel }: CorpusSectionPropTypes) => {
     return (
-        <section className="corpus-section mt-5">
-            <CorpusParams updateTfidfParams={updateTfidfParams} />
+        <form className="corpus-form mt-5" onSubmit={(e) => e.preventDefault()}>
+            <CorpusParams updateTfidfParams={updateTfidfParams} updateNnParams={updateNnParams} />
             <CorpusForm 
                 addCorpusElement={addCorpusElement} 
                 buildModel={buildModel} 
             />
             <CorpusContainer corpus={corpus} removeCorpusElement={removeCorpusElement} />
-        </section>
+        </form>
     )
 }
-const CorpusParams = ({ updateTfidfParams }: CorpusParamsType) => {
+const CorpusParams = ({ updateTfidfParams, updateNnParams }: CorpusParamsType) => {
     return (
         <fieldset className="corpus-params">
+            <div className="corpus-param">
+                <label htmlFor="Metric-param param" className='param-label'>Metric</label>
+                <select name="metric" id="metric-param param" onChange={e => updateNnParams({ metric: e.target.value })}>
+                    <option value="cosine">Cosine</option>
+                    <option value="euclidean">Euclidean</option>
+                    <option value="haversine">Haversine</option>
+                    <option value="l1">L1</option>
+                    <option value="l2">L2</option>
+                    <option value="manhattan">Manhattan</option>
+                    <option value="nan_euclidean">NaN Euclidean</option>
+                </select>
+            </div>
             <legend>Corpus Parameters</legend>
             <div className="corpus-param">
                 <label htmlFor="ngram-param" className='param-label'>N-gram Range</label>
@@ -51,7 +63,7 @@ const CorpusParams = ({ updateTfidfParams }: CorpusParamsType) => {
 const CorpusForm = ({ addCorpusElement, buildModel }: CorpusFormPropTypes) => {
     const [corpusElement, setCorpusElement] = useState<CorpusElementType>('');
     return (
-        <form className="corpus-form mt-5" onSubmit={(e) => e.preventDefault()}>
+        <div className="add-corpus-container mt-5">
             <label htmlFor="corpus-input" className="corpus-label full-width">Add to corpus:</label>
             <input 
                 id="corpus-input" 
@@ -60,8 +72,8 @@ const CorpusForm = ({ addCorpusElement, buildModel }: CorpusFormPropTypes) => {
                 autoComplete='off'
                 onBlur={e => setCorpusElement(e.target.value)} />
             <button type='reset' onClick={() => addCorpusElement(corpusElement)}>Add</button>
-            <button type='reset' onClick={buildModel}>Build Model</button>
-        </form>
+            <button type='submit' onClick={buildModel}>Build Model</button>
+        </div> 
     )
 }
 
@@ -93,6 +105,7 @@ const CorpusContainer = ({ corpus, removeCorpusElement }: CorpusContainerPropTyp
 
 type CorpusSectionPropTypes = {
     updateTfidfParams: useCorpusType['updateTfidfParams']
+    updateNnParams: useCorpusType['updateNnParams']
     corpus: useCorpusType['corpus'],
     addCorpusElement: useCorpusType['addCorpusElement'],
     removeCorpusElement: useCorpusType['removeCorpusElement'],
@@ -100,7 +113,8 @@ type CorpusSectionPropTypes = {
 }
 
 type CorpusParamsType = {
-    updateTfidfParams: useCorpusType['updateTfidfParams']
+    updateTfidfParams: useCorpusType['updateTfidfParams'],
+    updateNnParams: useCorpusType['updateNnParams']
 }
 
 type CorpusFormPropTypes = {

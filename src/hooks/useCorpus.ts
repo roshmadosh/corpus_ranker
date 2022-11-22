@@ -7,6 +7,7 @@ export const useCorpus = (ws: WebSocket) => {
 
     const [corpus, setCorpus] = useState<useCorpusType['corpus']>([]);
     const [tfidfParams, setTfidfParams] = useState<Partial<TfidfParamsType>>(DEFAULT_TFIDF_PARAMS)
+    const [nnParams, setNnParams] = useState<NnParamsType>(DEFAULT_NN_PARAMS);
     const [flag, setFlag] = useState<FlagType>()
 
     ws.onmessage = event => {
@@ -34,6 +35,10 @@ export const useCorpus = (ws: WebSocket) => {
         setTfidfParams({ ...tfidfParams, ...params });
     }
 
+    const updateNnParams: StateSetter<NnParamsType> = (params: Partial<NnParamsType>) => {
+        setNnParams({ ...nnParams, ...params });
+    }
+
     const buildModel = async () => {
 
         // save corpus to local storage
@@ -48,9 +53,7 @@ export const useCorpus = (ws: WebSocket) => {
         const response_obj = await fetch('http://localhost:8000/model', {
             method: "POST",
             mode: "cors",
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(request_body)
         })
 
@@ -75,7 +78,8 @@ export const useCorpus = (ws: WebSocket) => {
         buildModel, 
         rankCorpus, 
         corpusFlag: flag, 
-        updateTfidfParams
+        updateTfidfParams,
+        updateNnParams
     } as  useCorpusType;
 }
 
@@ -87,7 +91,8 @@ export type useCorpusType = {
     removeCorpusElement: StateSetter<CorpusElementType>,
     buildModel: () => void,
     rankCorpus: (userInput: string) => void,
-    updateTfidfParams: StateSetter<TfidfParamsType>
+    updateTfidfParams: StateSetter<TfidfParamsType>,
+    updateNnParams: StateSetter<NnParamsType>
 }
 
 export type CorpusElementType = string
@@ -98,8 +103,16 @@ type TfidfParamsType = {
     analyzer: string
 }
 
+type NnParamsType = {
+    metric: string
+}
+
 const DEFAULT_TFIDF_PARAMS: TfidfParamsType = {
     stopWords: false,
     ngramRange: [1,1],
     analyzer: 'word'
+}
+
+const DEFAULT_NN_PARAMS: NnParamsType = {
+    metric: 'cosine'
 }

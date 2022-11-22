@@ -51,6 +51,10 @@ input, select {
 input[type=text] {
     padding: var(--input-padding);
 }
+input[type=number] {
+    text-align: right;
+    width: 5ch;
+}
 
 button, input, select {
     font-size: 1.6rem;
@@ -61,7 +65,7 @@ label {
     margin-bottom: var(--label-bottom-margin);
 }
 
-.corpus-form {
+.add-corpus-container {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
     column-gap: 2ch;

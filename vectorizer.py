@@ -11,15 +11,16 @@ from models import S3Accessor
 stemmer = nltk.stem.PorterStemmer()
 
 
-def build_models(user_id, corpus, tfidf_args, nn_args):
+def build_models(user_id, corpus, tfidf_params, nn_params):
     # get user-determined hyperparameters for tfidf
-    stop_words = tfidf_args.get('stop_words', None)
-    analyzer = tfidf_args.get('analyzer', 'word')
+    stop_words = tfidf_params.get('stopWords', None)
+    stop_words = 'english' if stop_words else None
+    analyzer = tfidf_params.get('analyzer', 'word')
     tokenizer = _tokenizer if analyzer == 'word' else None
-    ngram_range = tfidf_args.get('ngram_range', (1,1))
+    ngram_range = tuple(tfidf_params.get('ngramRange', (1,1)))
 
     # do the same for nearest neighbors
-    metric = nn_args.get('metric', 'cosine')
+    metric = nn_params.get('metric', 'cosine')
 
     tfidf = TfidfVectorizer(stop_words=stop_words, analyzer=analyzer, tokenizer=tokenizer, ngram_range=ngram_range)
     corpus_transformed = tfidf.fit_transform(corpus)
@@ -45,7 +46,6 @@ def rank_corpus(user_input: str, corpus: List[str], tfidf, nn) -> List[str]:
 
     # rank corpus
     rankings = [corpus[ind] for ind in neighbor_indices]
-
     return rankings
 
 

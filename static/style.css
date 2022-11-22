@@ -5,6 +5,7 @@
     --corpus-element-y-margin: 2vh;
     --label-bottom-margin: 1ch;
     --page-margin: 90%;
+    --fieldset-padding: 2ch;
 }
 
 * {
@@ -39,11 +40,19 @@ button {
     width: var(--button-width);
 }
 
-input {
+fieldset {
+    padding: var(--fieldset-padding);
+}
+
+input, select {
+    margin: 0 .5ch;
+}
+
+input[type=text] {
     padding: var(--input-padding);
 }
 
-button, input {
+button, input, select {
     font-size: 1.6rem;
 }
 
@@ -99,8 +108,9 @@ label {
     font-weight: 700;
 }
 
-
-
+.param-label {
+    display: inline-block;
+}
 
 /* DESCRIPTIVE CLASSES */
 

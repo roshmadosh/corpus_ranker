@@ -6,7 +6,7 @@ import { StateSetter, FlagType } from '../utils';
 export const useCorpus = (ws: WebSocket) => {
 
     const [corpus, setCorpus] = useState<useCorpusType['corpus']>([]);
-    const [tfidfParams, setTfidfParams] = useState<Partial<TfidfParamsType>>({})
+    const [tfidfParams, setTfidfParams] = useState<Partial<TfidfParamsType>>(DEFAULT_TFIDF_PARAMS)
     const [flag, setFlag] = useState<FlagType>()
 
     ws.onmessage = event => {
@@ -30,8 +30,8 @@ export const useCorpus = (ws: WebSocket) => {
         setCorpus(corpus.filter(element => element != corpusElement));
     }
 
-    const updateTfidfParams: StateSetter<TfidfParamsType> = (params: TfidfParamsType) => {
-        setTfidfParams(params);
+    const updateTfidfParams: StateSetter<TfidfParamsType> = (params: Partial<TfidfParamsType>) => {
+        setTfidfParams({ ...tfidfParams, ...params });
     }
 
     const buildModel = async () => {
@@ -42,17 +42,17 @@ export const useCorpus = (ws: WebSocket) => {
         // send corpus to model-builder API endpoint
         const request_body = {
             corpus,
-            tfidfParams
+            tfidf_params: tfidfParams
         }
 
         const response_obj = await fetch('http://localhost:8000/model', {
-                method: "POST",
-                mode: "cors",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(request_body)
-            })
+            method: "POST",
+            mode: "cors",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(request_body)
+        })
 
         const response = await response_obj.json();
  
@@ -93,7 +93,13 @@ export type useCorpusType = {
 export type CorpusElementType = string
 
 type TfidfParamsType = {
-    stopWords: 'english',
+    stopWords: boolean,
     ngramRange: [number, number],
-    analyzer: 'word' | 'char' | 'char_wb'
+    analyzer: string
+}
+
+const DEFAULT_TFIDF_PARAMS: TfidfParamsType = {
+    stopWords: false,
+    ngramRange: [1,1],
+    analyzer: 'word'
 }

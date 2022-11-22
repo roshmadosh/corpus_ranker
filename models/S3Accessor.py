@@ -1,4 +1,3 @@
-import datetime
 import boto3
 
 class S3Accessor():
@@ -16,7 +15,8 @@ class S3Accessor():
             self.bucket.put_object(Key=self._construct_key(key), Body=body)
             print(f'SUCCESSFULLY PUSHED {key} TO {self.bucket_name} S3 BUCKET')
         except Exception as e:
-            print('S3 ERROR:', e)
+            print('ERROR in S3Accessor.write_to_bucket(), see logs.')
+            raise e
 
     def read_from_bucket(self, key: str):
         try:

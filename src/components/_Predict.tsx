@@ -1,5 +1,5 @@
 import React from 'react';
-import { AppChildrenPropTypes } from '../App';
+import { useCorpusType } from '../hooks/useCorpus';
 
 
 
@@ -18,5 +18,5 @@ export const Predict = ({ rankCorpus }: PredictPropTypes) => {
 }
 
 type PredictPropTypes = {
-    rankCorpus: AppChildrenPropTypes['rankCorpus']
+    rankCorpus: useCorpusType['rankCorpus']
 }

@@ -27,7 +27,10 @@ def build_models(user_id, corpus, tfidf_args, nn_args):
     nn_model.fit(corpus_transformed)
 
     # persist to s3
-    _persist_models(user_id, tfidf, nn_model)
+    try:    
+        _persist_models(user_id, tfidf, nn_model)
+    except Exception as e:
+        raise e
 
 
 def rank_corpus(user_input: str, corpus: List[str], tfidf, nn) -> List[str]:

@@ -7,7 +7,7 @@ import { useCorpus } from "./hooks/useCorpus";
 const ws = new WebSocket("ws://localhost:8000/rank/");
 
 export const App = () => {
-    const {corpus, addCorpusElement, buildModel, rankCorpus, corpusFlag} = useCorpus(ws);
+    const {corpus, addCorpusElement, removeCorpusElement, buildModel, rankCorpus, corpusFlag} = useCorpus(ws);
     const [flag, setFlag] = useState<FlagType>()
     
     useEffect(() => {
@@ -19,7 +19,12 @@ export const App = () => {
 
     return (
         <main>
-            <CorpusSection corpus={corpus} addCorpusElement={addCorpusElement} buildModel={buildModel} />
+            <CorpusSection 
+                corpus={corpus} 
+                addCorpusElement={addCorpusElement} 
+                removeCorpusElement={removeCorpusElement}
+                buildModel={buildModel} 
+            />
             <Predict rankCorpus={rankCorpus}/>
             {flag && <Toast success={flag.success} message={flag.message}/>}
         </main>

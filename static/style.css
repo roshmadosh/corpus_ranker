@@ -90,7 +90,17 @@ label {
     color: ghostwhite;
     background-color: rebeccapurple;
     margin: var(--corpus-element-y-margin) 0;
+    display: flex;
+    justify-content: space-between;
 }
+
+.corpus-element > span {
+    cursor: pointer;
+    font-weight: 700;
+}
+
+
+
 
 /* DESCRIPTIVE CLASSES */
 

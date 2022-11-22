@@ -1,3 +1,4 @@
+import { None } from 'framer-motion';
 import { useState } from 'react';
 import { StateSetter, FlagType } from '../utils';
 
@@ -5,6 +6,7 @@ import { StateSetter, FlagType } from '../utils';
 export const useCorpus = (ws: WebSocket) => {
 
     const [corpus, setCorpus] = useState<useCorpusType['corpus']>([]);
+    const [tfidfParams, setTfidfParams] = useState<Partial<TfidfParamsType>>({})
     const [flag, setFlag] = useState<FlagType>()
 
     ws.onmessage = event => {
@@ -24,6 +26,14 @@ export const useCorpus = (ws: WebSocket) => {
         setCorpus(updatedCorpus);
     }
 
+    const removeCorpusElement: StateSetter<CorpusElementType> = (corpusElement: CorpusElementType) => {
+        setCorpus(corpus.filter(element => element != corpusElement));
+    }
+
+    const updateTfidfParams: StateSetter<TfidfParamsType> = (params: TfidfParamsType) => {
+        setTfidfParams(params);
+    }
+
     const buildModel = async () => {
 
         // save corpus to local storage
@@ -31,7 +41,8 @@ export const useCorpus = (ws: WebSocket) => {
 
         // send corpus to model-builder API endpoint
         const request_body = {
-            corpus
+            corpus,
+            tfidfParams
         }
 
         const response_obj = await fetch('http://localhost:8000/model', {
@@ -57,7 +68,15 @@ export const useCorpus = (ws: WebSocket) => {
         ws.send(JSON.stringify(corpus_obj))
     }
 
-    return {corpus, addCorpusElement, buildModel, rankCorpus, corpusFlag: flag } as  useCorpusType;
+    return {
+        corpus, 
+        addCorpusElement, 
+        removeCorpusElement, 
+        buildModel, 
+        rankCorpus, 
+        corpusFlag: flag, 
+        updateTfidfParams
+    } as  useCorpusType;
 }
 
 
@@ -65,8 +84,16 @@ export type useCorpusType = {
     corpus: CorpusElementType[],
     corpusFlag: FlagType,
     addCorpusElement: StateSetter<CorpusElementType>,
+    removeCorpusElement: StateSetter<CorpusElementType>,
     buildModel: () => void,
     rankCorpus: (userInput: string) => void,
+    updateTfidfParams: StateSetter<TfidfParamsType>
 }
 
 export type CorpusElementType = string
+
+type TfidfParamsType = {
+    stopWords: 'english',
+    ngramRange: [number, number],
+    analyzer: 'word' | 'char' | 'char_wb'
+}

@@ -20,10 +20,15 @@ class S3Accessor():
             raise e
 
     def get_last_id(self):
+        '''
+            Each user will have their own directory (whose name is the ID of the user) 
+            in the S3 bucket containing pickle files. We get the ID to use as cookie.
+        '''
         try:
-            response = self.client.list_buckets()
-            last_bucket = response['Buckets'][-1]
-            print(last_bucket['Name'])
+            resp = self.client.list_objects_v2(Bucket=self.bucket_name)
+            key_name = resp['Contents'][-1]['Key']
+            id = key_name[:key_name.index('/')]
+            return int(id)
         except Exception as e:
             print('ERROR in S3Accessor.write_to_bucket(), see logs.')
             raise e

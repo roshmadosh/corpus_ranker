@@ -4,7 +4,9 @@ class ResponseBody:
         self.message = message
 
         ranks = kwargs.get('ranks', None)
+        cookie = kwargs.get('cookie', None)
         self.ranks = ranks
+        self.cookie= cookie
     
     def jsonify(self):
-        return { "success": self.success, "message": self.message, "ranks": self.ranks }
+        return vars(self)

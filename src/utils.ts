@@ -1,11 +1,9 @@
 export type StateSetter<A> = (state: Partial<A>) => void;
 
-export type FlagType = {
-    success: boolean,
-    message: string
-} 
 
-export const getCookie = function(name: string) {
-    var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-    if (match) return match[2];
-  }
+export const getCookie = () => document.cookie.substring(document.cookie.indexOf('=')+1)
+export const setCookie = async () => await fetch('http://localhost:8000/cookie',  {
+    method: 'POST',
+    mode: "cors",
+    headers: { 'Content-Type': 'application/json' },
+}).then(res => res.json()).then(obj => obj['cookie']);

@@ -21,11 +21,10 @@ def read_root(request: Request):
 
 @app.post('/cookie')
 def get_cookie(response: Response):
-    #TODO
-    # s3 = S3Accessor()
-    # s3.get_last_id()
-    response.set_cookie(key="user_id", value=5, expires=1000000)
-    return ResponseBody(True, 'Set cookie for user.').jsonify()
+    s3 = S3Accessor()
+    id = s3.get_last_id() + 1
+    response.set_cookie(key="user_id", value=id, expires=1000000)
+    return ResponseBody(True, 'Set cookie for user.', cookie=id).jsonify()
 
 @app.post('/model/')
 async def model_builder(args: ModelBuilderParams):

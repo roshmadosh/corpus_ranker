@@ -1,6 +1,7 @@
-import { getCookie } from '../utils'
+import { getCookie, setCookie } from '../utils'
 import { useState } from 'react';
-import { StateSetter, FlagType } from '../utils';
+import { StateSetter } from '../utils';
+import { useFlag } from './useFlag';
 
 
 export const useCorpus = (ws: WebSocket) => {
@@ -8,7 +9,7 @@ export const useCorpus = (ws: WebSocket) => {
     const [corpus, setCorpus] = useState<useCorpusType['corpus']>([]);
     const [tfidfParams, setTfidfParams] = useState<Partial<TfidfParamsType>>(DEFAULT_TFIDF_PARAMS)
     const [nnParams, setNnParams] = useState<NnParamsType>(DEFAULT_NN_PARAMS);
-    const [flag, setFlag] = useState<FlagType>()
+    const { setFlag } = useFlag();    
 
     ws.onmessage = event => {
         const { data } = event;
@@ -44,7 +45,15 @@ export const useCorpus = (ws: WebSocket) => {
         // save corpus to local storage
         localStorage.setItem('corpus-ranker_corpus', JSON.stringify(corpus));
 
-        const user_id = getCookie('user_id')
+        let user_id = getCookie()
+        
+        // const setCookieAndGetResponse = async () => {
+        //     const response = await setCookie();
+        //     setFlag(response);
+        // }
+        if (!user_id)   
+        
+            user_id = await setCookie();
 
         // send corpus to model-builder API endpoint
         const request_body = {
@@ -52,7 +61,7 @@ export const useCorpus = (ws: WebSocket) => {
             corpus,
             tfidf_params: tfidfParams
         }
-        console.log(request_body)
+
         const response_obj = await fetch('http://localhost:8000/model', {
             method: "POST",
             mode: "cors",
@@ -68,7 +77,7 @@ export const useCorpus = (ws: WebSocket) => {
 
     const rankCorpus = (userInput: string) => {
         const corpus = localStorage.getItem('corpus-ranker_corpus') ?? '[]';
-        const userId = getCookie('user_id')
+        const userId = getCookie()
 
         const corpus_obj = {
             userId,
@@ -84,7 +93,6 @@ export const useCorpus = (ws: WebSocket) => {
         removeCorpusElement, 
         buildModel, 
         rankCorpus, 
-        corpusFlag: flag, 
         updateTfidfParams,
         updateNnParams
     } as  useCorpusType;
@@ -93,7 +101,6 @@ export const useCorpus = (ws: WebSocket) => {
 
 export type useCorpusType = {
     corpus: CorpusElementType[],
-    corpusFlag: FlagType,
     addCorpusElement: StateSetter<CorpusElementType>,
     removeCorpusElement: StateSetter<CorpusElementType>,
     buildModel: () => void,

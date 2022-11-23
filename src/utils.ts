@@ -1,4 +1,4 @@
-export type StateSetter<A> = (state: Partial<A>) => void;
+export type StateSetter<A> = (state: A) => void;
 
 
 export const getCookie = () => document.cookie.substring(document.cookie.indexOf('=')+1)

@@ -1,15 +1,12 @@
 import { getCookie, setCookie } from '../utils'
-import { useState } from 'react';
+import { useState, useContext} from 'react';
 import { StateSetter } from '../utils';
-import { useFlag } from './useFlag';
 
-
-export const useCorpus = (ws: WebSocket) => {
-
+export const useCorpus = (ws: WebSocket, setFlag: any) => {
     const [corpus, setCorpus] = useState<useCorpusType['corpus']>([]);
-    const [tfidfParams, setTfidfParams] = useState<Partial<TfidfParamsType>>(DEFAULT_TFIDF_PARAMS)
+    const [tfidfParams, setTfidfParams] = useState<Partial<TfidfParamsType>>(DEFAULT_TFIDF_PARAMS);
     const [nnParams, setNnParams] = useState<NnParamsType>(DEFAULT_NN_PARAMS);
-    const { setFlag } = useFlag();    
+
 
     ws.onmessage = event => {
         const { data } = event;
@@ -19,7 +16,7 @@ export const useCorpus = (ws: WebSocket) => {
         if (success) {
             setCorpus(ranks);
         } else {
-            setFlag({ success, message });
+            setFlag!({ success, message });
         }
     }
 
@@ -47,12 +44,7 @@ export const useCorpus = (ws: WebSocket) => {
 
         let user_id = getCookie()
         
-        // const setCookieAndGetResponse = async () => {
-        //     const response = await setCookie();
-        //     setFlag(response);
-        // }
         if (!user_id)   
-        
             user_id = await setCookie();
 
         // send corpus to model-builder API endpoint
@@ -72,7 +64,7 @@ export const useCorpus = (ws: WebSocket) => {
 
         const response = await response_obj.json();
  
-        setFlag({ success: response.success, message: response.message })   
+        setFlag!({ success: response.success, message: response.message })   
     }
 
     const rankCorpus = (userInput: string) => {
@@ -95,7 +87,7 @@ export const useCorpus = (ws: WebSocket) => {
         rankCorpus, 
         updateTfidfParams,
         updateNnParams
-    } as  useCorpusType;
+    } as useCorpusType;
 }
 
 

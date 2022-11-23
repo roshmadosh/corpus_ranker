@@ -1,7 +1,8 @@
 import boto3
 
 class S3Accessor():
-    def __init__(self, user_id) -> None:
+    def __init__(self, **kwargs) -> None:
+        user_id = kwargs.get('user_id', None)
         _client = boto3.client('s3')
         _resource = boto3.resource('s3')
 
@@ -18,8 +19,19 @@ class S3Accessor():
             print('ERROR in S3Accessor.write_to_bucket(), see logs.')
             raise e
 
+    def get_last_id(self):
+        try:
+            response = self.client.list_buckets()
+            last_bucket = response['Buckets'][-1]
+            print(last_bucket['Name'])
+        except Exception as e:
+            print('ERROR in S3Accessor.write_to_bucket(), see logs.')
+            raise e
+
     def read_from_bucket(self, key: str):
         try:
+            s3 = S3Accessor()
+            
             response = self.client.get_object(Bucket=self.bucket_name, Key=self._construct_key(key))
             content = response['Body']
 

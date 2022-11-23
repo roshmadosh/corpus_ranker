@@ -63,42 +63,42 @@ const CorpusParams = ({ updateTfidfParams, updateNnParams }: CorpusParamsType) =
 const CorpusForm = ({ addCorpusElement, buildModel }: CorpusFormPropTypes) => {
     const [corpusElement, setCorpusElement] = useState<CorpusElementType>('');
     return (
-        <div className="add-corpus-container mt-5">
-            <label htmlFor="corpus-input" className="corpus-label full-width">Add to corpus:</label>
-            <input 
-                id="corpus-input" 
-                className='full-width'
-                type="text" 
-                autoComplete='off'
-                onBlur={e => setCorpusElement(e.target.value)} />
-            <button type='reset' onClick={() => addCorpusElement(corpusElement)}>Add</button>
-            <button type='submit' onClick={buildModel}>Build Model</button>
+        <div className="mt-5">
+            <label htmlFor="corpus-input" className="corpus-label">Add to corpus:</label>
+            <div className='add-corpus-container '>
+                <input 
+                    id="corpus-input" 
+                    type="text" 
+                    autoComplete='off'
+                    onBlur={e => setCorpusElement(e.target.value)} />
+                <button type='reset' onClick={() => addCorpusElement(corpusElement)}>Add</button>
+                <button type='submit' onClick={buildModel}>Build Model</button>
+            </div>
         </div> 
     )
 }
 
 const CorpusContainer = ({ corpus, removeCorpusElement }: CorpusContainerPropTypes) => {
     return (
-        <AnimatePresence>
+
             <motion.div
                 className='corpus-container'
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
             >
-                {corpus.map((content, idx) => (
-                    <AnimatePresence>
+                <AnimatePresence>
+                    {corpus.map((content, idx) => (
                         <motion.div
                             key={`ce-${idx}`}
                             className={`corpus-element full-width ce-${idx}`}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0}}
                         ><p>{content}</p><span onClick={() => removeCorpusElement(content)} >x</span></motion.div>
-                    </AnimatePresence>
-                ))}
+                    ))}
+                </AnimatePresence>
             </motion.div>
-        </AnimatePresence>
+
     )
 }
 

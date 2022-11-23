@@ -1,4 +1,4 @@
-import { None } from 'framer-motion';
+import { getCookie } from '../utils'
 import { useState } from 'react';
 import { StateSetter, FlagType } from '../utils';
 
@@ -44,18 +44,22 @@ export const useCorpus = (ws: WebSocket) => {
         // save corpus to local storage
         localStorage.setItem('corpus-ranker_corpus', JSON.stringify(corpus));
 
+        const user_id = getCookie('user_id')
+
         // send corpus to model-builder API endpoint
         const request_body = {
+            user_id,
             corpus,
             tfidf_params: tfidfParams
         }
-
+        console.log(request_body)
         const response_obj = await fetch('http://localhost:8000/model', {
             method: "POST",
             mode: "cors",
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(request_body)
         })
+        
 
         const response = await response_obj.json();
  
@@ -63,8 +67,11 @@ export const useCorpus = (ws: WebSocket) => {
     }
 
     const rankCorpus = (userInput: string) => {
-        const corpus = localStorage.getItem('corpus-ranker_corpus') ?? '[]'
+        const corpus = localStorage.getItem('corpus-ranker_corpus') ?? '[]';
+        const userId = getCookie('user_id')
+
         const corpus_obj = {
+            userId,
             userInput,
             corpus: JSON.parse(corpus)
         }

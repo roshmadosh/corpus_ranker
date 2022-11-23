@@ -5,7 +5,7 @@ import { useCorpusType } from '../hooks/useCorpus';
 
 export const Predict = ({ rankCorpus }: PredictPropTypes) => {
     return (
-        <div className="search-container container">
+        <div className="search-container mt-5">
             <label htmlFor="search-input">Search:</label>
             <input 
                 type="text" 

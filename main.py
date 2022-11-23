@@ -1,23 +1,31 @@
-from fastapi import FastAPI, Request, WebSocket
+from fastapi import FastAPI, Request, WebSocket, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
-from typing import List
 from vectorizer import build_models, rank_corpus, import_models
-from models import ResponseBody, ModelBuilderParams
 import datetime
-from utils import create_dir_if_none, write_log
+from models import ResponseBody, ModelBuilderParams, S3Accessor
+from utils import write_log
 
 
 app = FastAPI()
+
 
 app.mount('/static', StaticFiles(directory='static'), name='static')
 templates = Jinja2Templates(directory='templates')
 
 @app.get('/', response_class=HTMLResponse)
 def read_root(request: Request):
+    
     return templates.TemplateResponse('index.html', { "request": request })
 
+@app.post('/cookie')
+def get_cookie(response: Response):
+    #TODO
+    # s3 = S3Accessor()
+    # s3.get_last_id()
+    response.set_cookie(key="user_id", value=5, expires=1000000)
+    return ResponseBody(True, 'Set cookie for user.').jsonify()
 
 @app.post('/model/')
 async def model_builder(args: ModelBuilderParams):
@@ -46,7 +54,8 @@ async def rank(websocket: WebSocket):
         user_id = results_obj.get('userId', 1)
         corpus = results_obj.get('corpus', [])
         user_input = results_obj.get('userInput', '')
-
+        if not user_id:
+            print('NO USER ID')
         if not user_input: 
             continue
 

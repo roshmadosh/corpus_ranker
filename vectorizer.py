@@ -5,7 +5,6 @@ import numpy as np
 from typing import List
 import string
 import pickle
-import json
 from models import S3Accessor
 
 stemmer = nltk.stem.PorterStemmer()
@@ -50,10 +49,13 @@ def rank_corpus(user_input: str, corpus: List[str], tfidf, nn) -> List[str]:
 
 
 def import_models(user_id) -> List:
-    s3_accessor = S3Accessor(user_id=user_id)
     
     # import models from pickle files
     try:
+
+        s3_accessor = S3Accessor(user_id=user_id)
+    
+
         tfidf_raw = s3_accessor.read_from_bucket('tfidf_model.pickle')
         nn_raw = s3_accessor.read_from_bucket('nn_model.pickle')
 

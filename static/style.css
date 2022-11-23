@@ -6,6 +6,10 @@
     --label-bottom-margin: 1ch;
     --page-margin: 90%;
     --fieldset-padding: 2ch;
+    --color-black: #2f2f2f;
+    --color-white: ghostwhite;
+    --color-primary: dodgerblue;
+    --color-secondary: rgb(252, 193, 85);
 }
 
 * {
@@ -19,12 +23,23 @@ html {
     font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+
 body {
     font-size: 1.6rem;
     width: var(--page-margin);
     max-width: 1460px;
     margin: auto;
 }
+
+nav {
+    background-color: var(--color-secondary);
+    color: var(--color-primary);
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
 
 main {
     display: grid;
@@ -38,6 +53,25 @@ button {
     display: inline-block;
     padding: var(--input-padding);
     width: var(--button-width);
+    cursor: pointer;
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    border-radius: 6px;
+    border: none;
+    transition: all 0.2s;
+}
+
+button:hover {
+    background-color: royalblue;
+}
+
+a {
+    text-decoration: none;
+    color: var(--color-primary);
+}
+
+a:hover {
+    color: royalblue;
 }
 
 fieldset {
@@ -50,6 +84,8 @@ input, select {
 
 input[type=text] {
     padding: var(--input-padding);
+    min-width: 20ch;
+    width: 70%;
 }
 input[type=number] {
     text-align: right;
@@ -65,17 +101,26 @@ label {
     margin-bottom: var(--label-bottom-margin);
 }
 
+.header-item {
+    padding: var(--input-padding);
+    cursor: pointer;
+}
+
 .add-corpus-container {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    column-gap: 2ch;
-    justify-items: right;
+    display: flex;
+    justify-content: space-between; 
+}
+
+.about-container {
+    padding: 2ch;
+    line-height: 4ch;
 }
 .corpus-label {
-    grid-column: 1 / -1;
+    display: block;
 }
+
 #corpus-input {
-    grid-column: 1 / 5;
+    width: 70%;
 }
 
 

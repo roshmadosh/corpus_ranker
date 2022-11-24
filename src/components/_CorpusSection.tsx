@@ -81,23 +81,23 @@ const CorpusForm = ({ addCorpusElement, buildModel }: CorpusFormPropTypes) => {
 const CorpusContainer = ({ corpus, removeCorpusElement }: CorpusContainerPropTypes) => {
     return (
 
-            <motion.div
-                className='corpus-container'
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-            >
-                <AnimatePresence>
-                    {corpus.map((content, idx) => (
-                        <motion.div
-                            key={`ce-${idx}`}
-                            className={`corpus-element full-width ce-${idx}`}
-                            initial={{ opacity: 0, y: -20 }}
-                            animate={{ opacity: 1, y: 0}}
-                        ><p>{content}</p><span onClick={() => removeCorpusElement(content)} >x</span></motion.div>
-                    ))}
-                </AnimatePresence>
-            </motion.div>
+        <motion.div
+            className='corpus-container'
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+        >
+            <AnimatePresence>
+                {corpus.map((content, idx) => (
+                    <motion.div
+                        key={`ce-${idx}`}
+                        className={`corpus-element full-width ce-${idx}`}
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0}}
+                    ><p>{content}</p><span onClick={() => removeCorpusElement(content)} >x</span></motion.div>
+                ))}
+            </AnimatePresence>
+        </motion.div>
 
     )
 }

@@ -35,7 +35,6 @@ class S3Accessor():
 
     def read_from_bucket(self, key: str):
         try:
-            s3 = S3Accessor()
             
             response = self.client.get_object(Bucket=self.bucket_name, Key=self._construct_key(key))
             content = response['Body']

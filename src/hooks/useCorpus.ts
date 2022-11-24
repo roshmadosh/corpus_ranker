@@ -1,12 +1,13 @@
 import { getCookie, setCookie } from '../utils'
-import { useState, useContext} from 'react';
-import { StateSetter } from '../utils';
+import { useState } from 'react';
+import { useFlag } from './useFlag';
 
-export const useCorpus = (ws: WebSocket, setFlag: any) => {
+export const useCorpus = (ws: WebSocket) => {
     const [corpus, setCorpus] = useState<useCorpusType['corpus']>([]);
     const [tfidfParams, setTfidfParams] = useState<Partial<TfidfParamsType>>(DEFAULT_TFIDF_PARAMS);
     const [nnParams, setNnParams] = useState<NnParamsType>(DEFAULT_NN_PARAMS);
 
+    const { updateFlag } = useFlag();
 
     ws.onmessage = event => {
         const { data } = event;
@@ -16,24 +17,24 @@ export const useCorpus = (ws: WebSocket, setFlag: any) => {
         if (success) {
             setCorpus(ranks);
         } else {
-            setFlag!({ success, message });
+            updateFlag({ success, message });
         }
     }
 
-    const addCorpusElement: StateSetter<CorpusElementType> = (corpusElement: CorpusElementType) => {
+    const addCorpusElement = (corpusElement: CorpusElementType) => {
         const updatedCorpus = [...corpus, corpusElement];
         setCorpus(updatedCorpus);
     }
 
-    const removeCorpusElement: StateSetter<CorpusElementType> = (corpusElement: CorpusElementType) => {
+    const removeCorpusElement = (corpusElement: CorpusElementType) => {
         setCorpus(corpus.filter(element => element != corpusElement));
     }
 
-    const updateTfidfParams: StateSetter<TfidfParamsType> = (params: Partial<TfidfParamsType>) => {
+    const updateTfidfParams = (params: Partial<TfidfParamsType>) => {
         setTfidfParams({ ...tfidfParams, ...params });
     }
 
-    const updateNnParams: StateSetter<NnParamsType> = (params: Partial<NnParamsType>) => {
+    const updateNnParams = (params: Partial<NnParamsType>) => {
         setNnParams({ ...nnParams, ...params });
     }
 
@@ -42,7 +43,7 @@ export const useCorpus = (ws: WebSocket, setFlag: any) => {
         // save corpus to local storage
         localStorage.setItem('corpus-ranker_corpus', JSON.stringify(corpus));
 
-        let user_id = getCookie()
+        let user_id = getCookie('user_id');
         
         if (!user_id)   
             user_id = await setCookie();
@@ -53,7 +54,7 @@ export const useCorpus = (ws: WebSocket, setFlag: any) => {
             corpus,
             tfidf_params: tfidfParams
         }
-
+        
         const response_obj = await fetch('http://localhost:8000/model', {
             method: "POST",
             mode: "cors",
@@ -64,12 +65,12 @@ export const useCorpus = (ws: WebSocket, setFlag: any) => {
 
         const response = await response_obj.json();
  
-        setFlag!({ success: response.success, message: response.message })   
+        updateFlag({ success: response.success, message: response.message })   
     }
 
     const rankCorpus = (userInput: string) => {
         const corpus = localStorage.getItem('corpus-ranker_corpus') ?? '[]';
-        const userId = getCookie()
+        const userId = getCookie('user_id')
 
         const corpus_obj = {
             userId,
@@ -93,12 +94,12 @@ export const useCorpus = (ws: WebSocket, setFlag: any) => {
 
 export type useCorpusType = {
     corpus: CorpusElementType[],
-    addCorpusElement: StateSetter<CorpusElementType>,
-    removeCorpusElement: StateSetter<CorpusElementType>,
+    addCorpusElement: (corpusElement: CorpusElementType) => void,
+    removeCorpusElement: (corpusElement: CorpusElementType) => void,
     buildModel: () => void,
     rankCorpus: (userInput: string) => void,
-    updateTfidfParams: StateSetter<TfidfParamsType>,
-    updateNnParams: StateSetter<NnParamsType>
+    updateTfidfParams: (params: Partial<TfidfParamsType>) => void,
+    updateNnParams: (params: Partial<NnParamsType>) => void,
 }
 
 export type CorpusElementType = string

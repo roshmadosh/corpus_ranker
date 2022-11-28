@@ -1,19 +1,18 @@
-import React, { useContext } from "react";
+import React from "react";
 import { CorpusSection, Predict, Toast, Header, AboutPage} from "./components";
 import { useCorpus } from "./hooks/useCorpus";
-
+import { useFlag } from "./hooks/useFlag";
+import { getCookie, setCookie } from "./utils";
 import {
     BrowserRouter as Router,
     Route,
     Switch
   } from "react-router-dom";
-import { useFlag } from "./hooks/useFlag";
 
-
-const ws = new WebSocket("ws://localhost:8000/rank/");
 
 export const App = () => {
     const { flag } = useFlag()
+ 
     const {
         corpus, 
         addCorpusElement, 
@@ -22,7 +21,7 @@ export const App = () => {
         rankCorpus,  
         updateTfidfParams,
         updateNnParams
-    } = useCorpus(ws);
+    } = useCorpus();
 
     
     return (

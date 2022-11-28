@@ -1,25 +1,47 @@
-import { getCookie, setCookie } from '../utils'
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useFlag } from './useFlag';
+import { getCookie, setCookie } from "../utils";
 
-export const useCorpus = (ws: WebSocket) => {
+async function getUserId() {
+    let user_id = getCookie('user_id');
+        
+    if (!user_id)   
+        user_id = await setCookie();
+
+    return user_id;
+}
+
+export const useCorpus = () => {
     const [corpus, setCorpus] = useState<useCorpusType['corpus']>([]);
     const [tfidfParams, setTfidfParams] = useState<Partial<TfidfParamsType>>(DEFAULT_TFIDF_PARAMS);
     const [nnParams, setNnParams] = useState<NnParamsType>(DEFAULT_NN_PARAMS);
+    const [userId, setUserId] = useState<String | undefined>("")
+    const webSocketRef = useRef<WebSocket | null>(null);
 
     const { updateFlag } = useFlag();
 
-    ws.onmessage = event => {
-        const { data } = event;
-        const response_obj = JSON.parse(data);
-        const { success, message, ranks } = response_obj
-        
-        if (success) {
-            setCorpus(ranks);
-        } else {
-            updateFlag({ success, message });
+    useEffect(() => {
+        getUserId()
+            .then(id => {
+                setUserId(id); 
+                webSocketRef.current = new WebSocket(`ws://localhost:8000/rank/${id ?? ""}`)
+
+                webSocketRef.current.onmessage = event => {
+                    const { data } = event;
+                    const response_obj = JSON.parse(data);
+                    const { success, message, ranks } = response_obj
+                    
+                    if (success) {
+                        setCorpus(ranks);
+                    } else {
+                        updateFlag({ success, message });
+                    }
+                }
+            });
         }
-    }
+    , [])
+
+
 
     const addCorpusElement = (corpusElement: CorpusElementType) => {
         const updatedCorpus = [...corpus, corpusElement];
@@ -43,14 +65,10 @@ export const useCorpus = (ws: WebSocket) => {
         // save corpus to local storage
         localStorage.setItem('corpus-ranker_corpus', JSON.stringify(corpus));
 
-        let user_id = getCookie('user_id');
-        
-        if (!user_id)   
-            user_id = await setCookie();
 
         // send corpus to model-builder API endpoint
         const request_body = {
-            user_id,
+            user_id: userId,
             corpus,
             tfidf_params: tfidfParams
         }
@@ -77,7 +95,7 @@ export const useCorpus = (ws: WebSocket) => {
             userInput,
             corpus: JSON.parse(corpus)
         }
-        ws.send(JSON.stringify(corpus_obj))
+        webSocketRef.current!.send(JSON.stringify(corpus_obj))
     }
 
     return {

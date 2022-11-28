@@ -2,9 +2,7 @@ from fastapi import FastAPI, Request, WebSocket, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
-from vectorizer import build_models, rank_corpus, import_models
-import datetime
-from models import ResponseBody, ModelBuilderParams, S3Accessor
+from models import ResponseBody, ModelBuilderParams, S3Accessor, Vectorizer
 from utils import write_log
 
 
@@ -29,8 +27,15 @@ def get_cookie(response: Response):
 @app.post('/model/')
 async def model_builder(args: ModelBuilderParams):
     try:
-        build_models(**args.dict())
+        user_id = args.dict()['user_id']
+        args = [val for key, val in args.dict().items() if key != "user_id"]
+        s3_accessor = S3Accessor(user_id=user_id)
+        vectorizer = Vectorizer(accessor = s3_accessor)
+
+        vectorizer.build_models(*args)
+
         return ResponseBody(True, "Models successfully built.").jsonify()
+
     except Exception as e:
         print('ERROR:', e)
         write_log(e)
@@ -38,10 +43,11 @@ async def model_builder(args: ModelBuilderParams):
     
 
 
-@app.websocket("/rank/")
-async def rank(websocket: WebSocket):
+@app.websocket("/rank/{user_id}")
+async def rank(websocket: WebSocket, user_id: str):
     await websocket.accept()
-
+    s3_accessor = S3Accessor(user_id=user_id)
+    vectorizer = Vectorizer(s3_accessor)
     # attempt to make models "static" after first fetch
     tfidf = None
     nn = None
@@ -50,18 +56,19 @@ async def rank(websocket: WebSocket):
         results_obj = await websocket.receive_json()
 
         # destructure results dict
-        user_id = results_obj.get('userId', 1)
         corpus = results_obj.get('corpus', [])
         user_input = results_obj.get('userInput', '')
-        if not user_id:
-            print('NO USER ID')
-        if not user_input: 
-            continue
 
-        # fetch models from S3, if needed
+
         try:
+            if not user_id:
+                raise Exception('No user id')
+            if not user_input: 
+                continue
+
+            # fetch models from S3, if needed
             if not tfidf or not nn:
-                tfidf, nn = import_models(user_id=user_id)
+                tfidf, nn = vectorizer.import_models()
 
         except Exception as e:
             write_log(e)
@@ -70,7 +77,7 @@ async def rank(websocket: WebSocket):
 
         # run models
         try:
-            ranks = rank_corpus(user_input, corpus, tfidf=tfidf, nn=nn)
+            ranks = vectorizer.rank_corpus(user_input, corpus, tfidf=tfidf, nn=nn)
             await websocket.send_json(ResponseBody(True, "Results successfully ranked!", ranks=ranks).jsonify())
         except BaseException as e:
             await websocket.send_json(ResponseBody(False, "Something went wrong while ranking corpus. See logs.").jsonify())

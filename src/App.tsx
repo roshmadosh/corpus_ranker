@@ -1,8 +1,7 @@
 import React from "react";
-import { CorpusSection, Predict, Toast, Header, AboutPage} from "./components";
+import { CorpusParams, CorpusSection, Predict, Toast, Header, AboutPage} from "./components";
 import { useCorpus } from "./hooks/useCorpus";
 import { useFlag } from "./hooks/useFlag";
-import { getCookie, setCookie } from "./utils";
 import {
     BrowserRouter as Router,
     Route,
@@ -33,6 +32,7 @@ export const App = () => {
                     <AboutPage />
                 </Route>
                 <Route path="/">
+                    <CorpusParams updateTfidfParams={updateTfidfParams} updateNnParams={updateNnParams} />
                     <CorpusSection 
                         updateTfidfParams={updateTfidfParams}
                         updateNnParams={updateNnParams}

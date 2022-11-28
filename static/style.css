@@ -9,7 +9,11 @@
     --color-black: #2f2f2f;
     --color-white: ghostwhite;
     --color-primary: dodgerblue;
-    --color-secondary: rgb(252, 193, 85);
+    --color-secondary: rgba(250, 199, 106, 1);
+    --color-secondary-75: rgba(250, 199, 106, .75);
+    --color-secondary-50: rgba(250, 199, 106, .5);
+    --color-secondary-25: rgba(250, 199, 106, .25);
+
 }
 
 * {
@@ -32,7 +36,6 @@ body {
 }
 
 nav {
-    background-color: var(--color-secondary);
     color: var(--color-primary);
     width: 100%;
     display: flex;
@@ -148,9 +151,8 @@ label {
 }
 
 .corpus-element {
+    color: var(--color-primary);
     padding: var(--input-padding);
-    color: ghostwhite;
-    background-color: rebeccapurple;
     margin: var(--corpus-element-y-margin) 0;
     display: flex;
     justify-content: space-between;
@@ -178,22 +180,18 @@ label {
 /* CORPUS ELEMENT COLORS */
 
 .ce-0 {
-    background-color: midnightblue;
-    color: ghostwhite;
+    background-color: var(--color-secondary);
+    color: var(--color-primary);
 }
 .ce-1 {
-    background: #212191;
-    color: ghostwhite;
+    background: var(--color-secondary-75);
+    color: var(--color-primary);
 }
 .ce-2 {
-    background: #2a2abb;
-    color: ghostwhite;
+    background: var(--color-secondary-50);
+    color: var(--color-primary);
 }
 .ce-3 {
-    background: #4444d5;
-    color: ghostwhite;
-}
-.ce-4 {
-    background: #6e6ede;
-    color: ghostwhite;
+    background: var(--color-secondary-25);
+    color: var(--color-primary);
 }

@@ -4,10 +4,20 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from models import ResponseBody, ModelBuilderParams, S3Accessor, Vectorizer
 from utils import write_log
-
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+origins = [
+    "*"
+]
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.mount('/static', StaticFiles(directory='static'), name='static')
 templates = Jinja2Templates(directory='templates')
@@ -19,10 +29,15 @@ def read_root(request: Request):
 
 @app.post('/cookie')
 def get_cookie(response: Response):
-    s3 = S3Accessor()
+    try:
+        s3 = S3Accessor()
+    except Exception as e:
+        return ResponseBody(True, f'ERROR: {e}', cookie=99).jsonify()   
     id = s3.get_last_id() + 1
     response.set_cookie(key="user_id", value=id, expires=1000000)
     return ResponseBody(True, 'Set cookie for user.', cookie=id).jsonify()
+
+
 
 @app.post('/model/')
 async def model_builder(args: ModelBuilderParams):

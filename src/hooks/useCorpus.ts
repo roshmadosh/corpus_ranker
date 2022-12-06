@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useFlag } from './useFlag';
-import { getCookie, setCookie } from "../utils";
+import { getCookie, setCookie, URL } from "../utils";
 
 async function getUserId() {
     let user_id = getCookie('user_id');
@@ -24,7 +24,7 @@ export const useCorpus = () => {
         getUserId()
             .then(id => {
                 setUserId(id); 
-                webSocketRef.current = new WebSocket(`ws://localhost:8000/rank/${id ?? ""}`)
+                webSocketRef.current = new WebSocket(`ws://${URL}/rank/${id ?? ""}`)
 
                 webSocketRef.current.onmessage = event => {
                     const { data } = event;
@@ -73,7 +73,7 @@ export const useCorpus = () => {
             tfidf_params: tfidfParams
         }
         
-        const response_obj = await fetch('http://localhost:8000/model', {
+        const response_obj = await fetch(`http://${URL}/model`, {
             method: "POST",
             mode: "cors",
             headers: { 'Content-Type': 'application/json' },

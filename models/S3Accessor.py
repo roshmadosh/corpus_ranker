@@ -3,8 +3,9 @@ import boto3
 class S3Accessor():
     def __init__(self, **kwargs) -> None:
         user_id = kwargs.get('user_id', None)
-        _client = boto3.client('s3')
-        _resource = boto3.resource('s3')
+        session = boto3.Session()
+        _client = session.client('s3')
+        _resource = session.resource('s3')
 
         self.user_id = user_id
         self.bucket_name = 'corpus-ranker'

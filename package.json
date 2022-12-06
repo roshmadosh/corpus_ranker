@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/roshmadosh/text_search_poc#readme",
   "devDependencies": {
+    "@types/node": "^18.11.11",
     "@types/react": "^18.0.25",
     "@types/react-dom": "^18.0.9",
     "@types/react-router-dom": "^5.3.3",

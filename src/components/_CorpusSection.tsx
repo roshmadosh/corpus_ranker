@@ -39,6 +39,8 @@ const CorpusContainer = ({ corpus, removeCorpusElement }: CorpusContainerPropTyp
     return (
 
         <motion.div
+            // @ts-ignore
+            key={corpus}
             className='corpus-container'
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -47,11 +49,12 @@ const CorpusContainer = ({ corpus, removeCorpusElement }: CorpusContainerPropTyp
             <AnimatePresence>
                 {corpus.map((content, idx) => (
                     <motion.div
-                        key={`ce-${idx}`}
                         className={`corpus-element full-width ce-${idx}`}
                         initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0}}
-                    ><p>{content}</p><span onClick={() => removeCorpusElement(content)} >x</span></motion.div>
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: idx * .1 }}
+                    ><p>{content}</p><span onClick={() => removeCorpusElement(content)} >x</span>
+                    </motion.div>
                 ))}
             </AnimatePresence>
         </motion.div>

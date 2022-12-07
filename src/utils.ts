@@ -1,9 +1,9 @@
 const environment = {
-    LOCAL: 'localhost',
+    LOCAL: 'localhost:8000',
     PROD: '54.152.251.12'
 }
 
-export const URL = environment.PROD;
+export const URL = environment.LOCAL;
 
 export const getCookie = (name: string) => {
     // document.cookie returns a single string of comma-separated key-value pairs of cookies

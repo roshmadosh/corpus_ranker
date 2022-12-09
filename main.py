@@ -28,7 +28,7 @@ def read_root(request: Request):
     return templates.TemplateResponse('index.html', { "request": request })
 
 @app.post('/cookie')
-def get_cookie(response: Response):
+def create_cookie(response: Response):
     try:
         s3 = S3Accessor()
     except Exception as e:

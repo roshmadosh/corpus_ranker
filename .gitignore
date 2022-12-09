@@ -5,3 +5,4 @@ logs/
 pickle_jar/
 .aws/
 .env
+makefile
